@@ -1,27 +1,18 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-        <style>
-            .lead {
-                padding-top: 10px;
-                padding-bottom: 10px;
-                padding-left: 6px;
-                padding-right: 6px;
-                margin-top: 10px;
-                background-color: #f6f6f6;
-                width: 100%;
-            }
-        </style>
-    </head>
-    <body>
-        {% block content %}
-        {% endblock content%}
-        {% include "scripts.html" %}
-    </body>
+  <head>
+    <meta charset="utf-8" />
+    <title>KubaCRM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="max-w-7xl mx-auto">
+      {% include 'navbar.html' %} {% block content %} {% endblock content%}
+    </div>
+    {% include "scripts.html" %}
+  </body>
 </html>

@@ -46,8 +46,10 @@
               Blue bottle crucifix vinyl post-ironic four dollar toast vegan
               taxidermy. Gastropub indxgo juice poutine.
             </p>
-            <a href="#" class="mt-3 text-indigo-500 inline-flex items-center"
-              >View this lead
+            <a
+              href="{% url 'agents:agent-detail' agent.pk %}"
+              class="mt-3 text-indigo-500 inline-flex items-center"
+              >View agent
               <svg
                 fill="none"
                 stroke="currentColor"

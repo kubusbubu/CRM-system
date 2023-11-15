@@ -212,6 +212,20 @@ class CategoryListView(LoginRequiredMixin, generic.ListView):
         return queryset
 
 
+class CategoryDetailView(LoginRequiredMixin, generic.DeleteView):
+    template_name = "leads/category_detail.html"
+    context_object_name = "category"
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_organisor:
+            queryset = Category.objects.filter(organization=user.userprofile)
+        else:
+            queryset = Category.objects.filter(organization=user.agent.organization)
+
+        return queryset
+    
+
 # def lead_update(request, pk):
 #     lead = Lead.objects.get(id=pk)
 #     form = LeadForm()

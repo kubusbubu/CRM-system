@@ -10,7 +10,7 @@ from django.contrib.auth.views import (
     PasswordResetCompleteView
     )
 from django.urls import path, include
-from leads.views import landing_page, LandingPageView, SignupView
+from leads.views import LandingPageView, SignupView
 
 urlpatterns = [
     path('admin/', admin.site.urls),

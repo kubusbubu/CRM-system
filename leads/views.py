@@ -7,7 +7,6 @@ from agents.mixins import OrganisorAndLoginRequiredMixin
 from .models import Lead, Agent, Category
 from .forms import LeadForm, LeadModelForm, CustomUserCreationForm, AssignAgentForm, LeadCategoryUpdateForm
 
-
 # CRUD+L - Create, Retrieve, Update and Delete + List
 
 
@@ -29,29 +28,31 @@ class LeadListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_organisor: # type: ignore
+        if user.is_organisor:  # type: ignore
             queryset = Lead.objects.filter(
-                organization=user.userprofile, # type: ignore
+                organization=user.userprofile,  # type: ignore
                 agent__isnull=False
-            )
+            ).order_by('-score')  # Sort by score in descending order
         else:
-            queryset = Lead.objects.filter(organization=user.agent.organization) # type: ignore
-            # filter
-            queryset = queryset.filter(agent__user=user)
+            queryset = Lead.objects.filter(
+                organization=user.agent.organization,  # type: ignore
+                agent__user=user
+            ).order_by('-score')  # Sort by score in descending order
         return queryset
 
     def get_context_data(self, **kwargs):
         user = self.request.user
-        context = super(LeadListView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         if user.is_organisor:
-            queryset = Lead.objects.filter(
-                organization=user.userprofile, # type: ignore
+            unassigned_leads = Lead.objects.filter(
+                organization=user.userprofile,  # type: ignore
                 agent__isnull=True
-            )
+            ).order_by('-score')  # Sort unassigned leads by score
             context.update({
-                "unassigned_leads": queryset
+                "unassigned_leads": unassigned_leads
             })
         return context
+
 
 
 class LeadDetailView(LoginRequiredMixin, generic.DetailView):

@@ -25,6 +25,12 @@
             <p class="leading-relaxed text-base">Score: <strong>{{ lead.score|default:"N/A" }}</strong></p>
             <p class="leading-relaxed text-base">Email: {{ lead.email|default:"N/A" }}</p>
             <p class="leading-relaxed text-base">Phone: {{ lead.phone_number|default:"N/A" }}</p>
+            {% if lead.do_not_email == True %}
+            <p class="leading-relaxed text-base">Do not Email</p>
+            {% endif %}
+            {% if lead.do_not_call == True %}
+            <p class="leading-relaxed text-base">Do not call</p>
+            {% endif %}
             <a href="{% url 'leads:lead-detail' lead.pk %}" class="mt-3 text-indigo-500 inline-flex items-center">View this lead
               <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
                 <path d="M5 12h14M12 5l7 7-7 7"></path>

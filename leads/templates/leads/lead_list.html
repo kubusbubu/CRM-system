@@ -1,4 +1,4 @@
-{% extends "base.html"%}
+{% extends "base.html" %}
 {% block content %}
 <section class="text-gray-600 body-font">
   <div class="container px-5 py-24 mx-auto">
@@ -26,10 +26,10 @@
             <p class="leading-relaxed text-base">Email: {{ lead.email|default:"N/A" }}</p>
             <p class="leading-relaxed text-base">Phone: {{ lead.phone_number|default:"N/A" }}</p>
             {% if lead.do_not_email == True %}
-            <p class="leading-relaxed text-base">Do not Email</p>
+              <p class="leading-relaxed text-base">Do not Email</p>
             {% endif %}
             {% if lead.do_not_call == True %}
-            <p class="leading-relaxed text-base">Do not call</p>
+              <p class="leading-relaxed text-base">Do not call</p>
             {% endif %}
             <a href="{% url 'leads:lead-detail' lead.pk %}" class="mt-3 text-indigo-500 inline-flex items-center">View this lead
               <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
@@ -37,12 +37,56 @@
               </svg>
             </a>
           </div>
+          <div class="ml-auto">
+            <p class="text-sm text-gray-500">{{ lead.category }}</p>
+          </div>
         </div>
       </div>
       {% empty %}
       <p class="w-full text-center text-gray-500">No leads available.</p>
       {% endfor %}
     </div>
+
+
+  <!-- Centered Pagination Controls -->
+  <div class="flex justify-center mt-5">
+      <div class="pagination">
+          <style>
+              .pagination a {
+                  text-decoration: none;
+                  color: #333;
+                  padding: 0.2em 0.5em;
+                  margin: 0 0.2em;
+                  border: 1px solid #ccc;
+                  border-radius: 3px;
+                  transition: background-color 0.3s, color 0.3s;
+              }
+
+              .pagination a:hover {
+                  background-color: #f2f2f2;
+                  color: #000;
+              }
+
+          </style>
+          <span class="step-links">
+              {% if leads.has_previous %}
+                  <a href="?page=1" class="pagination-link" title="First Page">&laquo;</a>
+                  <a href="?page={{ leads.previous_page_number }}" class="pagination-link" title="Previous Page">&lt;</a>
+              {% endif %}
+
+              <span class="current">
+                  Page {{ leads.number }} of {{ leads.paginator.num_pages }}
+              </span>
+
+              {% if leads.has_next %}
+                  <a href="?page={{ leads.next_page_number }}" class="pagination-link" title="Next Page">&gt;</a>
+                  <a href="?page={{ leads.paginator.num_pages }}" class="pagination-link" title="Last Page">&raquo;</a>
+              {% endif %}
+          </span>
+      </div>
+  </div>
+
+
 
     <!-- Unassigned Leads Section -->
     {% if unassigned_leads.exists %}

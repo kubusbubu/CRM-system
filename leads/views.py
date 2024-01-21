@@ -1,5 +1,6 @@
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect, reverse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views import generic
@@ -25,32 +26,47 @@ class LandingPageView(generic.TemplateView):
 class LeadListView(LoginRequiredMixin, generic.ListView):
     template_name = "leads/lead_list.html"
     context_object_name = "leads"
+    paginate_by = 20  # Set the number of items per page
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_organisor:  # type: ignore
+        if user.is_organisor:
             queryset = Lead.objects.filter(
-                organization=user.userprofile,  # type: ignore
+                organization=user.userprofile,
                 agent__isnull=False
-            ).order_by('-score')  # Sort by score in descending order
+            ).order_by('-score')
         else:
             queryset = Lead.objects.filter(
-                organization=user.agent.organization,  # type: ignore
+                organization=user.agent.organization,
                 agent__user=user
-            ).order_by('-score')  # Sort by score in descending order
+            ).order_by('-score')
         return queryset
 
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = super().get_context_data(**kwargs)
+        leads = self.get_queryset()
+        paginator = Paginator(leads, self.paginate_by)
+
+        page = self.request.GET.get('page')
+        try:
+            leads = paginator.page(page)
+        except PageNotAnInteger:
+            leads = paginator.page(1)
+        except EmptyPage:
+            leads = paginator.page(paginator.num_pages)
+
+        context['leads'] = leads
+
         if user.is_organisor:
             unassigned_leads = Lead.objects.filter(
-                organization=user.userprofile,  # type: ignore
+                organization=user.userprofile,
                 agent__isnull=True
-            ).order_by('-score')  # Sort unassigned leads by score
+            ).order_by('-score')
             context.update({
                 "unassigned_leads": unassigned_leads
             })
+
         return context
 
 

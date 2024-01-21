@@ -14,7 +14,19 @@
       </div>
       {% endif %}
     </div>
-
+    <!-- Filter by Category -->
+    <div class="mb-4">
+        <form method="get" class="flex items-center">
+            <label for="categoryFilter" class="text-gray-600">Filter by Category:</label>
+            <select id="categoryFilter" name="category" class="border p-2">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.name }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded">Apply</button>
+        </form>
+    </div>
     <!-- Leads List -->
     <div class="flex flex-wrap -m-4">
       {% for lead in leads %}

@@ -7,7 +7,9 @@ from django.views import generic
 from agents.mixins import OrganisorAndLoginRequiredMixin
 from .models import Lead, Agent, Category
 from .forms import LeadForm, LeadModelForm, CustomUserCreationForm, AssignAgentForm, LeadCategoryUpdateForm
-
+from django_filters.views import FilterView
+from .filters import LeadFilter
+from .forms import CategoryForm
 # CRUD+L - Create, Retrieve, Update and Delete + List
 
 
@@ -23,10 +25,11 @@ class LandingPageView(generic.TemplateView):
     template_name = "landing.html"
 
 
-class LeadListView(LoginRequiredMixin, generic.ListView):
+class LeadListView(LoginRequiredMixin, FilterView):
     template_name = "leads/lead_list.html"
     context_object_name = "leads"
-    paginate_by = 20  # Set the number of items per page
+    paginate_by = 20
+    filterset_class = LeadFilter
 
     def get_queryset(self):
         user = self.request.user
@@ -40,23 +43,12 @@ class LeadListView(LoginRequiredMixin, generic.ListView):
                 organization=user.agent.organization,
                 agent__user=user
             ).order_by('-score')
+
         return queryset
 
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = super().get_context_data(**kwargs)
-        leads = self.get_queryset()
-        paginator = Paginator(leads, self.paginate_by)
-
-        page = self.request.GET.get('page')
-        try:
-            leads = paginator.page(page)
-        except PageNotAnInteger:
-            leads = paginator.page(1)
-        except EmptyPage:
-            leads = paginator.page(paginator.num_pages)
-
-        context['leads'] = leads
 
         if user.is_organisor:
             unassigned_leads = Lead.objects.filter(
@@ -67,8 +59,11 @@ class LeadListView(LoginRequiredMixin, generic.ListView):
                 "unassigned_leads": unassigned_leads
             })
 
-        return context
+        # Get all unique categories from the Category model
+        categories = Category.objects.filter(organization=user.agent.organization)
+        context['categories'] = categories
 
+        return context
 
 
 class LeadDetailView(LoginRequiredMixin, generic.DetailView):
@@ -175,6 +170,19 @@ class CategoryListView(LoginRequiredMixin, generic.ListView):
 
         return queryset
 
+
+def add_category_view(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            # Set the organization before saving
+            form.instance.organization = request.user.agent.organization
+            form.save()
+            return redirect('leads:category-list')
+    else:
+        form = CategoryForm()
+
+    return render(request, 'leads/category_list.html', {'form': form})
 
 class CategoryDetailView(LoginRequiredMixin, generic.DeleteView):
     template_name = "leads/category_detail.html"

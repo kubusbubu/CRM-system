@@ -1,8 +1,10 @@
 from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.contrib.auth.models import AbstractUser, User
+from django.conf import settings
 from django.dispatch import receiver
 from PIL import Image
+import os
 
 
 class User(AbstractUser):
@@ -18,13 +20,25 @@ class UserProfile(models.Model):
         return self.user.username
 
     def save(self, *args, **kwargs):
+        # Check if the user already has a profile picture
+        try:
+            existing_user_profile = UserProfile.objects.get(user=self.user)
+            old_profile_picture = existing_user_profile.profile_picture
+            # If a new profile picture is uploaded, delete the old one
+            if self.profile_picture and old_profile_picture and self.profile_picture != old_profile_picture:
+                old_picture_path = os.path.join(settings.MEDIA_ROOT, str(old_profile_picture))
+                if os.path.exists(old_picture_path):
+                    os.remove(old_picture_path)
+        except UserProfile.DoesNotExist:
+            pass
+
         super().save(*args, **kwargs)
 
         img = Image.open(self.profile_picture.path)
 
         if img.height > 300 or img.width > 300:
             output_size = (300, 300)
-            # img.thumbnail(output_size)
+            img.thumbnail(output_size)
             img.save(self.profile_picture.path)
 
 

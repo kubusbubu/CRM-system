@@ -7,73 +7,57 @@
 <section class="text-gray-600 body-font overflow-hidden">
   <div class="container px-5 py-24 mx-auto">
     <div class="lg:w-4/5 mx-auto flex flex-wrap">
-
       <div class="lg:w-1/2 w-full lg:pr-10 lg:py-6 mb-6 lg:mb-0">
         <h2 class="text-sm title-font text-gray-500 tracking-widest">AGENT</h2>
         <h1 class="text-gray-900 text-3xl title-font font-medium mb-4">
-          {{agent.first_name}} {{agent.last_name}}
+          {{agent.user.first_name}} {{agent.user.last_name}}
         </h1>
         <div class="flex mb-4">
           <a
-            class="flex-grow text-indigo-500 border-b-2 border-indigo-500 py-2 text-lg px-1"
-          >Overview</a>
-          <a class="flex-grow border-b-2 border-gray-300 py-2 text-lg px-1"
-          >Reviews</a>
+            class="flex-grow text-indigo-500 border-b-2 border-indigo-500 py-2 text-lg px-1">
+            Overview
+          </a>
+          <a 
+            href="{% url 'agents:agent-statistics' agent.pk %}" 
+            class="flex-grow border-b-2 border-gray-300 py-2 text-lg px-1">
+            Statistics
+          </a>
           <a
             href="{% url 'agents:agent-update' agent.pk %}"
-            class="flex-grow border-b-2 border-gray-300 py-2 text-lg px-1"
-          >Update Details</a>
+            class="flex-grow border-b-2 border-gray-300 py-2 text-lg px-1"> 
+            Update Details
+          </a>
         </div>
-        <p class="leading-relaxed mb-4">
-          Fam locavore kickstarter distillery. Mixtape chillwave tumeric
-          sriracha taximy chia microdosing tilde DIY. XOXO fam inxigo juiceramps
-          cornhole raw denim forage brooklyn. Everyday carry +1 seitan poutine
-          tumeric. Gastropub blue bottle austin listicle pour-over, neutra jean.
-        </p>
         <div class="flex border-t border-gray-200 py-2">
           <span class="text-gray-500">Email</span>
-          <span class="ml-auto text-gray-900">{{agent.email}}</span>
+          <span class="ml-auto text-gray-900">{{agent.user.email}}</span>
         </div>
         <div class="flex border-t border-gray-200 py-2">
           <span class="text-gray-500">Joined</span>
-          <span class="ml-auto text-gray-900">{{agent.date_joined}}</span>
+          <span class="ml-auto text-gray-900">{{agent.user.date_joined}}</span>
         </div>
         <div class="flex border-t border-gray-200 py-2">
           <span class="text-gray-500">Active</span>
-          <span class="ml-auto text-gray-900">{{agent.is_active}}</span>
+          <span class="ml-auto text-gray-900">{{agent.user.is_active}}</span>
         </div>
         <div class="flex border-t border-b mb-6 border-gray-200 py-2">
           <span class="text-gray-500">Last active</span>
-          <span class="ml-auto text-gray-900">{{agent.last_login}}</span>
+          <span class="ml-auto text-gray-900">{{agent.user.last_login}}</span>
         </div>
         <div class="flex">
-          {% comment %} <form method="post" enctype="multipart/form-data" action="{% url 'agents:update-profile-picture' agent.pk %}">
-            {% csrf_token %}
-            {{ profile_picture_form.as_p }}
-            <button type="submit" class="rounded-full w-10 h-10 bg-gray-200 p-0 border-0 inline-flex items-center justify-center text-gray-500 ml-4">
-              <svg fill="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-5 h-5" viewBox="0 0 24 24">
-                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
-              </svg>
-            </button>
-          </form> {% endcomment %}
           <form method="post" enctype="multipart/form-data" action="{% url 'agents:update-profile-picture' agent.pk %}">
               {% csrf_token %}
               {{ form|crispy }}
               {{ profile_picture_form.profile_picture }}
-
               <button type="submit">Save</button>
           </form>
         </div>
       </div>
-
       <img
           alt="ecommerce"
           class="lg:w-1/2 w-full lg:h-auto h-64 object-cover object-center rounded"
           src="{% if agent.user.userprofile.profile_picture %}{{ agent.user.userprofile.profile_picture.url }}{% else %}{% static 'Boss_baby.jpg' %}{% endif %}"
       />
-
-
-
     </div>
   </div>
 </section>

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import AgentListView, AgentCreateView, AgentDetailView, AgentUpdateView, AgentDeleteView, update_profile_picture
+from .views import AgentListView, AgentCreateView, AgentDetailView, AgentUpdateView, AgentDeleteView, update_profile_picture, AgentStatisticsView
 
 app_name = 'agents'
 
@@ -10,4 +10,6 @@ urlpatterns = [
     path('<int:pk>/update/', AgentUpdateView.as_view(), name='agent-update'),
     path('<int:pk>/delete/', AgentDeleteView.as_view(), name='agent-delete'),
     path('<int:pk>/update-profile-picture/', update_profile_picture, name='update-profile-picture'),
+    path('<int:pk>/statistics/', AgentStatisticsView.as_view(), name='agent-statistics'),
+
 ]

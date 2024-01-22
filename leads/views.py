@@ -52,7 +52,19 @@ class LeadListView(LoginRequiredMixin, FilterView):
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = super().get_context_data(**kwargs)
+        leads = self.get_queryset()
+        paginator = Paginator(leads, self.paginate_by)
 
+        page = self.request.GET.get('page')
+        try:
+            leads = paginator.page(page)
+        except PageNotAnInteger:
+            leads = paginator.page(1)
+        except EmptyPage:
+            leads = paginator.page(paginator.num_pages)
+
+        context['leads'] = leads
+        
         if user.is_organisor:
             unassigned_leads = Lead.objects.filter(
                 organization=user.userprofile,

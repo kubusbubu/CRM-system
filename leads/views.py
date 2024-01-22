@@ -70,6 +70,11 @@ class LeadDetailView(LoginRequiredMixin, generic.DetailView):
     template_name = "leads/lead_detail.html"
     context_object_name = "lead"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()  # Replace LeadCategory with your actual model name
+        return context
+
     def get_queryset(self):
         user = self.request.user
         if user.is_organisor:

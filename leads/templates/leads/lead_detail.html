@@ -14,19 +14,31 @@
           <a
             href="{% url 'leads:lead-detail' lead.pk %}"
             class="flex-grow text-indigo-500 border-b-2 border-indigo-500 py-2 text-lg px-1">
-              Opis
+              Overview
           </a>
-          {% comment %} <a 
-            href="{% url 'leads:lead-category-update' lead.pk %}"
-            class="flex-grow border-b-2 border-gray-300 py-2 text-lg px-1">
-              Kategoria - TODO
-          </a> {% endcomment %}
           <a
             href="{% url 'leads:lead-update' lead.pk %}"
             class="flex-grow border-b-2 border-gray-300 py-2 text-lg px-1"
-            >Zaktualizuj dane - TODO</a
-          >
+            >Update Details
+          </a>
         </div>
+        
+        <form id="updateCategoryForm" method="post" action="{% url 'leads:lead-category-update' lead.pk %}">
+          {% csrf_token %}
+          
+          <div class="flex border-t border-gray-200 py-2">
+            <span class="text-gray-500">Category</span>
+            <div class="ml-auto text-gray-900">
+              <select name="category" id="id_category" onchange="submitForm()">
+                {% for category in categories %}
+                  <option value="{{ category.id }}" {% if category.id == lead.category.id %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+        </form>
+
         <div class="flex border-t border-gray-200 py-2">
           <span class="text-gray-500">Lead origin</span>
           <span class="ml-auto text-gray-900">{{lead.lead_origin}}</span>
@@ -38,6 +50,10 @@
         <div class="flex border-t border-gray-200 py-2">
           <span class="text-gray-500">Location</span>
           <span class="ml-auto text-gray-900">{{lead.address}}</span>
+        </div>
+        <div class="flex border-t border-gray-200 py-2">
+          <span class="text-gray-500">Current occupation</span>
+          <span class="ml-auto text-gray-900">{{lead.what_is_your_current_occupation}}</span>
         </div>
         <div class="flex border-t border-gray-200 py-2">
           <span class="text-gray-500">Email</span>
@@ -91,5 +107,11 @@
     </div>
   </div>
 </section>
+<script>
+  function submitForm() {
+    console.log("Form submitted");
+    document.getElementById("updateCategoryForm").submit();
+  }
 
+</script>
 {% endblock content%}

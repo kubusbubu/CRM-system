@@ -10,7 +10,7 @@ from django.contrib.auth.views import (
     PasswordResetCompleteView
     )
 from django.urls import path, include
-from leads.views import landing_page, LandingPageView, SignupView
+from leads.views import LandingPageView, SignupView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,4 +28,4 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

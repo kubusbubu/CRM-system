@@ -1,5 +1,8 @@
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect, reverse
+from django.views import View
+from django.shortcuts import redirect, get_object_or_404
+from django.db.models import Count
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
@@ -172,6 +175,8 @@ class CategoryListView(LoginRequiredMixin, generic.ListView):
             queryset = Category.objects.filter(organization=user.userprofile)
         else:
             queryset = Category.objects.filter(organization=user.agent.organization)
+        
+        queryset = queryset.annotate(lead_count=Count('leads'))
 
         return queryset
 
@@ -219,3 +224,10 @@ class LeadCategoryUpdateView(LoginRequiredMixin, generic.UpdateView):
     
     def get_success_url(self):
         return reverse("leads:lead-detail", kwargs={"pk": self.get_object().id})
+    
+
+class DeleteCategoryView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        category.delete()
+        return redirect('leads:category-list')

@@ -1,7 +1,9 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import AbstractUser
-
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+from django.db import models
 
 class User(AbstractUser):
     is_organisor = models.BooleanField(default=True)
@@ -70,8 +72,15 @@ class Lead(models.Model):
     agent = models.ForeignKey("Agent", null=True, blank=True, on_delete=models.SET_NULL)
     category = models.ForeignKey("Category", related_name="leads", null=True, blank=True, on_delete=models.SET_NULL)
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"    
+        return f"{self.first_name} {self.last_name}"  
 
+    # def save(self, *args, **kwargs):
+    #     # If the lead is not assigned to any category, set it to the "Unassigned" category
+    #     if not self.category:
+    #         unassigned_category, created = Category.objects.get_or_create(name="Unassigned")
+    #         print(f"Assigning 'Unassigned' category to lead {self.id}. Created: {created}")
+    #         self.category = unassigned_category
+    #     super().save(*args, **kwargs)
 
 class Agent(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -82,10 +91,22 @@ class Agent(models.Model):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=30) # New, Contacted, Converted, Unconverted
+    name = models.CharField(max_length=30)
     organization = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+
     def __str__(self):
         return self.name
+
+    @staticmethod
+    def handle_category_deletion(category):
+        unassigned_category, created = Category.objects.get_or_create(
+            name="Unassigned", defaults={'organization': category.organization}
+        )
+        Lead.objects.filter(category=category).update(category=unassigned_category)
+
+@receiver(pre_delete, sender=Category)
+def pre_delete_category(sender, instance, **kwargs):
+    Category.handle_category_deletion(instance)
 
 
 def post_user_created_signal(sender, instance, created, **kwargs):

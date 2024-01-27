@@ -36,17 +36,25 @@ class LeadListView(LoginRequiredMixin, FilterView):
 
     def get_queryset(self):
         user = self.request.user
+        # queryset = Lead.objects.filter(organization=user.userprofile)
+
         if user.is_organisor:
             queryset = Lead.objects.filter(
                 organization=user.userprofile,
                 agent__isnull=False
-            ).order_by('-score')
+            )
         else:
             queryset = Lead.objects.filter(
                 organization=user.agent.organization,
                 agent__user=user
-            ).order_by('-score')
+            )
 
+        # Apply category filtering if category is provided in the request
+        category_name = self.request.GET.get('category')
+        if category_name:
+            queryset = queryset.filter(category__name=category_name)
+
+        queryset = queryset.order_by('-score')
         return queryset
 
     def get_context_data(self, **kwargs):

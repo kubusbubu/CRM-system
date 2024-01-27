@@ -34,7 +34,14 @@
         <div class="flex border-2 rounded-lg border-gray-200 border-opacity-50 p-8 sm:flex-row flex-col">
           <div class="flex-grow">
             <h2 class="text-gray-900 text-lg title-font font-medium mb-3">{{ lead.first_name }} {{ lead.last_name }}</h2>
-            <p class="leading-relaxed text-base">Score: <strong>{{ lead.score|default:"N/A" }}</strong></p>
+            <!-- Visualize Lead Score -->
+            {% if lead.score >= 70 %}
+              <p class="leading-relaxed text-base">Score: <strong class="text-green-600">{{ lead.score|default:"N/A" }}</strong> 🔥</p>
+            {% elif lead.score >= 40 and lead.score <= 69 %}
+              <p class="leading-relaxed text-base">Score: <strong class="text-orange-600">{{ lead.score|default:"N/A" }}</strong> ☀️</p>
+            {% else %}
+              <p class="leading-relaxed text-base">Score: <strong class="text-blue-600">{{ lead.score|default:"N/A" }}</strong> ❄️</p>
+            {% endif %}
             <p class="leading-relaxed text-base">Email: {{ lead.email|default:"N/A" }}</p>
             <p class="leading-relaxed text-base">Phone: {{ lead.phone_number|default:"N/A" }}</p>
             {% if lead.do_not_email == True %}
@@ -59,6 +66,17 @@
       {% endfor %}
     </div>
 
+  <style>
+    .hot {
+      color: blue; /* Adjust color as per your design */
+    }
+    .warm {
+      color: blue; /* Adjust color as per your design */
+    }
+    .cold {
+      color: blue; /* Adjust color as per your design */
+    }
+  </style>
 
   <!-- Centered Pagination Controls -->
   <div class="flex justify-center mt-5">

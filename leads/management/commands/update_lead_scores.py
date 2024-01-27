@@ -60,7 +60,7 @@ class Command(BaseCommand):
 
             # Predict score
             probability = model.predict_proba(lead_df)[:, 1]
-            lead.score = probability[0] * 100
+            lead.score = round(probability[0] * 100)
             lead.save()
 
         self.stdout.write(self.style.SUCCESS('Successfully updated lead scores'))

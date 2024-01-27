@@ -1,13 +1,40 @@
 import random
 from django.core.mail import send_mail
 from django.views import generic
-from django.shortcuts import reverse
+from django.shortcuts import reverse, redirect
 from leads.models import Agent
-from .forms import AgentModelForm
+from .forms import AgentModelForm, UserProfileUpdateForm
 from .mixins import OrganisorAndLoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render
+from django.views import View
+from leads.models import Lead, Agent # Import the Lead model from the leads app
+from django.db.models import Count
 
 
-class AgentListView(OrganisorAndLoginRequiredMixin, generic.ListView):
+class AgentStatisticsView(View):
+    template_name = 'agents/agent_statistics.html'
+
+    def get(self, request, pk):
+        agent = Agent.objects.get(pk=pk)
+        
+        # Assuming you have a 'Category' model with 'name' field in your leads/models.py
+        categories = agent.organization.category_set.all()  # Retrieve all categories for the agent's organization
+
+        statistics = {}
+        for category in categories:
+            count = Lead.objects.filter(agent=agent, category=category).count()
+            statistics[category.name] = count
+
+        context = {
+            'agent': agent,
+            'statistics': statistics,
+        }
+
+        return render(request, self.template_name, context)
+    
+
+class AgentListView(LoginRequiredMixin, generic.ListView):
     template_name = "agents/agent_list.html"
 
     def get_queryset(self):
@@ -40,15 +67,56 @@ class AgentCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
         return super(AgentCreateView, self).form_valid(form)
 
 
-class AgentDetailView(OrganisorAndLoginRequiredMixin, generic.DetailView):
+class AgentDetailView(LoginRequiredMixin, generic.DetailView):
     template_name = "agents/agent_detail.html"
     context_object_name = "agent"
+
     def get_queryset(self):
-        organization = self.request.user.userprofile
+        organization = self.request.user.agent.organization
         return Agent.objects.filter(organization=organization)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_profile'] = self.request.user.agent.organization
+
+        # Add the profile picture update form
+        context['profile_picture_form'] = UserProfileUpdateForm(instance=context['user_profile'])
+
+        return context
+    
+from django.shortcuts import render, redirect
+from django.views import View
+from .forms import UserProfileUpdateForm
+
+class UserProfileUpdateView(View):
+    template_name = "path_to_template.html"  # Update with your actual template path
+
+    def get(self, request, *args, **kwargs):
+        form = UserProfileUpdateForm()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = UserProfileUpdateForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Save the form data to the database
+            form.save()
+            return redirect('profile_success')  # Redirect to a success page
+        return render(request, self.template_name, {'form': form})
+
+
+def update_profile_picture(request, pk):
+    agent = Agent.objects.get(pk=pk)
+    user_profile = agent.user.userprofile
+    if request.method == 'POST':
+        profile_picture_form = UserProfileUpdateForm(request.POST, request.FILES, instance=user_profile)
+        if profile_picture_form.is_valid():
+            profile_picture_form.save()
+
+    return redirect('agents:agent-detail', pk=pk)
+
     
 
-class AgentUpdateView(OrganisorAndLoginRequiredMixin, generic.UpdateView):
+class AgentUpdateView(LoginRequiredMixin, generic.UpdateView):
     template_name = "agents/agent_update.html"
     form_class = AgentModelForm
 
@@ -56,7 +124,7 @@ class AgentUpdateView(OrganisorAndLoginRequiredMixin, generic.UpdateView):
         return reverse("agents:agent-list")
     
     def get_queryset(self):
-        organization = self.request.user.userprofile
+        organization = self.request.user.agent.organization
         return Agent.objects.filter(organization=organization)
     
 class AgentDeleteView(OrganisorAndLoginRequiredMixin, generic.DeleteView):

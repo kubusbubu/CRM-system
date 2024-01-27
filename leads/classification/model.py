@@ -52,4 +52,4 @@ print(f"Cross-validation scores: {cv_scores}")
 print(f"Average cross-validation score: {cv_scores.mean()}")
 
 # Save the trained model
-# dump(model, 'leads/classification/model.joblib')
+dump(model, 'leads/classification/model.joblib')

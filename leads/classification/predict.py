@@ -1,6 +1,8 @@
 import pandas as pd
 from joblib import load
 
+"""This is only for testing model"""
+
 leads_actual = pd.read_csv('leads/classification/leads_actual.csv')
 
 model = load('leads/classification/model.joblib')

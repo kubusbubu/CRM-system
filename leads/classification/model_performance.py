@@ -12,6 +12,8 @@ from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, r
 import time
 import matplotlib.pyplot as plt
 
+"""This file is for measuring performence of different models"""
+
 # Wczytywanie danych
 w = 'leads/classification/Leads.csv'
 x1 = pd.read_csv(w)

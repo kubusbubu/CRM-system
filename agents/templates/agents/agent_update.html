@@ -30,7 +30,8 @@
           >
         </div>
         <form method="post">
-          {% csrf_token %} {{ form|crispy }}
+          {% csrf_token %} 
+          {{ form|crispy }}
           <button type="submit">Submit</button>
         </form>
         <a

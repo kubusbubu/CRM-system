@@ -5,6 +5,7 @@ from django.conf import settings
 from django.dispatch import receiver
 from PIL import Image
 import os
+import uuid
 
 
 class User(AbstractUser):
@@ -14,7 +15,7 @@ class User(AbstractUser):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    profile_picture = models.ImageField(upload_to='profile_pics/', null=True)
+    profile_picture = models.ImageField(upload_to='media/profile_pics/', default='default_pic/default.png', null=True)
 
     def __str__(self):
         return self.user.username
@@ -44,7 +45,7 @@ class UserProfile(models.Model):
 
 class Lead(models.Model):
     # Fields from the leads dataset
-    prospect_id = models.CharField(max_length=100, unique=True)
+    prospect_id = models.CharField(max_length=100, unique=True, blank=True)
     lead_number = models.CharField(max_length=100, blank=True, null=True)
     lead_origin = models.CharField(max_length=100, blank=True, null=True)
     lead_source = models.CharField(max_length=100, blank=True, null=True)
@@ -97,15 +98,14 @@ class Lead(models.Model):
     agent = models.ForeignKey("Agent", null=True, blank=True, on_delete=models.SET_NULL)
     category = models.ForeignKey("Category", related_name="leads", null=True, blank=True, on_delete=models.SET_NULL)
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"  
+        return f"{self.first_name} {self.last_name}"
 
-    # def save(self, *args, **kwargs):
-    #     # If the lead is not assigned to any category, set it to the "Unassigned" category
-    #     if not self.category:
-    #         unassigned_category, created = Category.objects.get_or_create(name="Unassigned")
-    #         print(f"Assigning 'Unassigned' category to lead {self.id}. Created: {created}")
-    #         self.category = unassigned_category
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        if not self.prospect_id:
+            # Generate a unique ID if prospect_id is not provided
+            self.prospect_id = uuid.uuid4().hex[:10]
+        super().save(*args, **kwargs)  
+
 
 class Agent(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

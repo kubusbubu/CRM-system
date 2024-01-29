@@ -5,15 +5,14 @@ from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Count
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
 from django.views import generic
 from agents.mixins import OrganisorAndLoginRequiredMixin
-from .models import Lead, Agent, Category
-from .forms import LeadForm, LeadModelForm, CustomUserCreationForm, AssignAgentForm, LeadCategoryUpdateForm
+from .models import Lead, Category
+from .forms import LeadModelForm, CustomUserCreationForm, AssignAgentForm, LeadCategoryUpdateForm
 from django_filters.views import FilterView
 from .filters import LeadFilter
 from .forms import CategoryForm
-# CRUD+L - Create, Retrieve, Update and Delete + List
+
 
 
 class SignupView(generic.CreateView):
@@ -81,9 +80,10 @@ class LeadListView(LoginRequiredMixin, FilterView):
             context.update({
                 "unassigned_leads": unassigned_leads
             })
+            categories = Category.objects.filter(organization=user.userprofile)
+        else:
+            categories = Category.objects.filter(organization=user.agent.organization)
 
-        # Get all unique categories from the Category model
-        categories = Category.objects.filter(organization=user.agent.organization)
         context['categories'] = categories
 
         return context
@@ -95,7 +95,7 @@ class LeadDetailView(LoginRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.all()  # Replace LeadCategory with your actual model name
+        context['categories'] = Category.objects.all()
         return context
 
     def get_queryset(self):

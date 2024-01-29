@@ -8,8 +8,8 @@ from .mixins import OrganisorAndLoginRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.views import View
-from leads.models import Lead, Agent # Import the Lead model from the leads app
-from django.db.models import Count
+from leads.models import Lead, Agent
+
 
 
 class AgentStatisticsView(View):
@@ -17,9 +17,8 @@ class AgentStatisticsView(View):
 
     def get(self, request, pk):
         agent = Agent.objects.get(pk=pk)
-        
-        # Assuming you have a 'Category' model with 'name' field in your leads/models.py
-        categories = agent.organization.category_set.all()  # Retrieve all categories for the agent's organization
+
+        categories = agent.organization.category_set.all()
 
         statistics = {}
         for category in categories:
@@ -79,30 +78,10 @@ class AgentDetailView(LoginRequiredMixin, generic.DetailView):
         context = super().get_context_data(**kwargs)
         context['user_profile'] = self.request.user.agent.organization
 
-        # Add the profile picture update form
         context['profile_picture_form'] = UserProfileUpdateForm(instance=context['user_profile'])
 
         return context
-    
-from django.shortcuts import render, redirect
-from django.views import View
-from .forms import UserProfileUpdateForm
-
-class UserProfileUpdateView(View):
-    template_name = "path_to_template.html"  # Update with your actual template path
-
-    def get(self, request, *args, **kwargs):
-        form = UserProfileUpdateForm()
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request, *args, **kwargs):
-        form = UserProfileUpdateForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Save the form data to the database
-            form.save()
-            return redirect('profile_success')  # Redirect to a success page
-        return render(request, self.template_name, {'form': form})
-
+ 
 
 def update_profile_picture(request, pk):
     agent = Agent.objects.get(pk=pk)
@@ -114,7 +93,6 @@ def update_profile_picture(request, pk):
 
     return redirect('agents:agent-detail', pk=pk)
 
-    
 
 class AgentUpdateView(LoginRequiredMixin, generic.UpdateView):
     template_name = "agents/agent_update.html"
@@ -126,7 +104,8 @@ class AgentUpdateView(LoginRequiredMixin, generic.UpdateView):
     def get_queryset(self):
         organization = self.request.user.agent.organization
         return Agent.objects.filter(organization=organization)
-    
+
+
 class AgentDeleteView(OrganisorAndLoginRequiredMixin, generic.DeleteView):
     template_name = "agents/agent_delete.html"
     context_object_name = "agent"

@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm
-from leads.models import Agent, UserProfile
+from leads.models import UserProfile
 
 User = get_user_model()
 
@@ -18,8 +17,7 @@ class AgentModelForm(forms.ModelForm):
 
 class CustomClearableFileInput(forms.ClearableFileInput):
     def render(self, name, value, attrs=None, renderer=None):
-        # Override the render method to remove the initial text
-        value = None  # Set value to None to remove the initial text
+        value = None 
         return super().render(name, value, attrs, renderer)
 
 class UserProfileUpdateForm(forms.ModelForm):

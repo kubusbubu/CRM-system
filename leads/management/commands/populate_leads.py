@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 import pandas as pd
 from itertools import cycle
-from leads.models import Lead, Agent, UserProfile, Category  # Adjust based on your model definition
+from leads.models import Lead, Agent, UserProfile, Category
 
 class Command(BaseCommand):
     help = 'Populate database with lead data from CSV'
@@ -27,8 +27,6 @@ class Command(BaseCommand):
 
             new_category, _ = Category.objects.get_or_create(name='New', organization=org)
 
-        # organization = UserProfile.objects.first().organization
-        # new_category, _ = Category.objects.get_or_create(name='New', organization=organization)
         for _, row in org_leads.iterrows():
             Lead.objects.create(
                 prospect_id=row['Prospect ID'],
@@ -78,9 +76,7 @@ class Command(BaseCommand):
                 age=row['age'],
                 # Round-robin assignment of agents
                 agent=next(agent_cycle),
-                # Assuming using the first UserProfile for organization
                 organization=org,
-                # Handle Category field as per your logic
                 category=new_category,  # Assign to 'New' category
             )
 

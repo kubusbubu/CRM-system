@@ -15,7 +15,6 @@ class Command(BaseCommand):
         leads_to_score = Lead.objects.filter(score__isnull=True)
 
         for lead in leads_to_score:
-            # Extracting features as per the model training script
             lead_data = {
                 'Prospect ID': lead.prospect_id,
                 'Lead Number': lead.lead_number,

@@ -131,7 +131,7 @@ LOGIN_URL = "/login"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = 'tailwind'
 
-# settings.py
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

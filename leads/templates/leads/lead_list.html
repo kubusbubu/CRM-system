@@ -8,11 +8,11 @@
         <h1 class="text-4xl text-gray-800">Leads</h1>
         <a class="text-gray-500 hover:text-blue-500" href="{% url 'leads:category-list' %}">View categories</a>
       </div>
-      {% comment %} {% if request.user.is_organisor %}
+      {% if request.user.is_organisor %}
       <div>
         <a class="text-gray-500 hover:text-blue-500" href="{% url 'leads:lead-create' %}">Create a new lead</a>
       </div>
-      {% endif %} {% endcomment %}
+      {% endif %}
     </div>
     <!-- Filter by Category -->
     <div class="mb-4">
